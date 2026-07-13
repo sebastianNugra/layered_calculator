@@ -1,8 +1,10 @@
 package dev.sebas.calculadora.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import dev.sebas.calculadora.dto.request.OperacionRequest;
@@ -29,10 +31,9 @@ public class OperacionServiceImpl implements OperacionService {
     public OperacionResponse crearOperacion(OperacionRequest request) {
 
         Double resultado = calcularResultado(
-            request.getValor1(),
-            request.getValor2(),
-            request.getTipo()
-        );
+                request.getValor1(),
+                request.getValor2(),
+                request.getTipo());
 
         Operacion operacion = new Operacion();
 
@@ -45,10 +46,9 @@ public class OperacionServiceImpl implements OperacionService {
         Operacion guardada = operacionRepository.save(operacion);
 
         return new OperacionResponse(
-            guardada.getId(),
-            guardada.getResultado()
-        );
-        
+                guardada.getId(),
+                guardada.getResultado());
+
     }
 
     private Double calcularResultado(Double valor1, Double valor2, TipoOperacion tipo) {
@@ -67,14 +67,15 @@ public class OperacionServiceImpl implements OperacionService {
 
     @Override
     public Page<HistorialResponse> obtenerHistorial(int page, int size) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerHistorial'");
+        return operacionRepository.findAll(PageRequest.of(page, size))
+                .map(this::convertirAHistorialResponse);
     }
 
     @Override
     public HistorialResponse obtenerPorId(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerPorId'");
+        return operacionRepository.findById(id)
+                .map(this::convertirAHistorialResponse)
+                .orElseThrow(() -> new RuntimeException("Operación no encontrada con id: " + id));
     }
 
     @Override
@@ -89,6 +90,13 @@ public class OperacionServiceImpl implements OperacionService {
         throw new UnsupportedOperationException("Unimplemented method 'eliminarOperacion'");
     }
 
-
-
+    private HistorialResponse convertirAHistorialResponse(Operacion op) {
+        return new HistorialResponse(
+                op.getId(),
+                op.getValor1(),
+                op.getValor2(),
+                op.getTipo().name(),
+                op.getResultado(),
+                op.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+    }
 }
