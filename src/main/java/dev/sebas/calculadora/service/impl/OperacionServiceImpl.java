@@ -80,8 +80,25 @@ public class OperacionServiceImpl implements OperacionService {
 
     @Override
     public OperacionResponse actualizarOperacion(Long id, OperacionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actualizarOperacion'");
+        Operacion operacionExistente = operacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Operación no encontrada con id: " + id));
+
+        Double resultado = calcularResultado(
+                request.getValor1(),
+                request.getValor2(),
+                request.getTipo());
+
+        operacionExistente.setValor1(request.getValor1());
+        operacionExistente.setValor2(request.getValor2());
+        operacionExistente.setTipo(request.getTipo());
+        operacionExistente.setResultado(resultado);
+        operacionExistente.setFecha(LocalDateTime.now());
+
+        Operacion actualizada = operacionRepository.save(operacionExistente);
+
+        return new OperacionResponse(
+                actualizada.getId(),
+                actualizada.getResultado());
     }
 
     @Override
