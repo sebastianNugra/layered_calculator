@@ -103,8 +103,10 @@ public class OperacionServiceImpl implements OperacionService {
 
     @Override
     public void eliminarOperacion(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarOperacion'");
+        if (!operacionRepository.existsById(id)) {
+            throw new RuntimeException("Operación no encontrada con id: " + id);
+        }
+        operacionRepository.deleteById(id);
     }
 
     private HistorialResponse convertirAHistorialResponse(Operacion op) {
