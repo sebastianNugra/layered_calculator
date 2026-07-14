@@ -16,6 +16,7 @@ import dev.sebas.calculadora.dto.response.HistorialResponse;
 import dev.sebas.calculadora.dto.response.OperacionResponse;
 import dev.sebas.calculadora.service.OperacionService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1/operaciones")
@@ -45,4 +46,12 @@ public class OperacionController {
         HistorialResponse respuesta = operacionService.obtenerPorId(id);
         return ResponseEntity.ok(respuesta);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OperacionResponse> actualizarOperacion(@PathVariable Long id,
+            @Valid @RequestBody OperacionRequest request) {
+        OperacionResponse respuesta = operacionService.actualizarOperacion(id, request);
+        return ResponseEntity.ok(respuesta);
+    }
+
 }
