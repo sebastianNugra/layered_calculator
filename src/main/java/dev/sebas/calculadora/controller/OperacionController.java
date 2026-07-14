@@ -3,6 +3,7 @@ package dev.sebas.calculadora.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,14 +36,14 @@ public class OperacionController {
     }
 
     @GetMapping("/historial")
-    public ResponseEntity<Page<HistorialResponse>> historial(
+    public ResponseEntity<Page<HistorialResponse>> obtenerHistorial(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(operacionService.obtenerHistorial(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HistorialResponse> operacion(@PathVariable Long id) {
+    public ResponseEntity<HistorialResponse> obtenerPorId(@PathVariable Long id) {
         HistorialResponse respuesta = operacionService.obtenerPorId(id);
         return ResponseEntity.ok(respuesta);
     }
@@ -54,4 +55,9 @@ public class OperacionController {
         return ResponseEntity.ok(respuesta);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarOperacion(@PathVariable Long id) {
+        operacionService.eliminarOperacion(id);
+        return ResponseEntity.noContent().build();
+    }
 }
