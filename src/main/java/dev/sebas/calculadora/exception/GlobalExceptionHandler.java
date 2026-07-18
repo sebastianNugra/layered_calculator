@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Bad Request");
-        body.put("message", "El formato del body es inválido");
+        body.put("message", "El formato es inválido");
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
