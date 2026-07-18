@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import dev.sebas.calculadora.dto.request.OperacionRequest;
 import dev.sebas.calculadora.dto.response.HistorialResponse;
 import dev.sebas.calculadora.dto.response.OperacionResponse;
+import dev.sebas.calculadora.exception.DivisionPorCeroException;
+import dev.sebas.calculadora.exception.OperacionNotFoundException;
 import dev.sebas.calculadora.model.Operacion;
 import dev.sebas.calculadora.model.TipoOperacion;
 import dev.sebas.calculadora.repository.OperacionRepository;
@@ -58,7 +60,7 @@ public class OperacionServiceImpl implements OperacionService {
             case MULTIPLICACION -> valor1 * valor2;
             case DIVISION -> {
                 if (valor2 == 0) {
-                    throw new IllegalArgumentException("No se puede dividir por cero");
+                    throw new DivisionPorCeroException();
                 }
                 yield valor1 / valor2;
             }
@@ -75,13 +77,13 @@ public class OperacionServiceImpl implements OperacionService {
     public HistorialResponse obtenerPorId(Long id) {
         return operacionRepository.findById(id)
                 .map(this::convertirAHistorialResponse)
-                .orElseThrow(() -> new RuntimeException("Operación no encontrada con id: " + id));
+                .orElseThrow(() -> new OperacionNotFoundException(id));
     }
 
     @Override
     public OperacionResponse actualizarOperacion(Long id, OperacionRequest request) {
         Operacion operacionExistente = operacionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Operación no encontrada con id: " + id));
+                .orElseThrow(() -> new OperacionNotFoundException(id));
 
         Double resultado = calcularResultado(
                 request.getValor1(),
@@ -104,7 +106,7 @@ public class OperacionServiceImpl implements OperacionService {
     @Override
     public void eliminarOperacion(Long id) {
         if (!operacionRepository.existsById(id)) {
-            throw new RuntimeException("Operación no encontrada con id: " + id);
+            throw new OperacionNotFoundException(id);
         }
         operacionRepository.deleteById(id);
     }
